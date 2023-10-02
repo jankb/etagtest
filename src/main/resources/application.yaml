@@ -1,0 +1,16 @@
+server:
+  port: 8181
+
+spring:
+  datasource:
+    url: jdbc:h2:file:/testdb
+    driver-class-name: org.h2.Driver
+    username: test
+    password: test
+  h2:
+    console:
+      enabled: true
+      settings:
+        trace: true
+        web-admin-password: test
+        web-allow-others: true
