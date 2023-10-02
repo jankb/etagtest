@@ -11,6 +11,6 @@ spring:
     console:
       enabled: true
       settings:
-        trace: true
+        trace: false
         web-admin-password: test
         web-allow-others: true

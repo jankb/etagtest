@@ -11,7 +11,7 @@ class ETagConfiguration {
     @Bean
     fun shallowEtagHeaderFilter(): FilterRegistrationBean<ShallowEtagHeaderFilter> {
         val filterRegBean = FilterRegistrationBean(ShallowEtagHeaderFilter())
-        filterRegBean.addUrlPatterns("/values/*")
+        filterRegBean.addUrlPatterns("/values/*", "/country/*")
         filterRegBean.setName("eTagFilter")
         return filterRegBean
     }
