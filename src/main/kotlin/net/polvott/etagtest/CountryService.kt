@@ -3,6 +3,7 @@ package net.polvott.etagtest
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,6 +17,17 @@ class CountryService {
                 id = it[CountryEntity.id].value,
                 name = it[CountryEntity.name],
                 population = it[CountryEntity.population],)
+        }
+    }
+
+    fun getAllCountries(): List<Country>
+    {
+        return CountryEntity.selectAll().map {
+            Country(
+                id = it[CountryEntity.id].value,
+                name = it[CountryEntity.name],
+                population = it[CountryEntity.population]
+            )
         }
     }
 
