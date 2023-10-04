@@ -12,7 +12,7 @@ import org.springframework.web.filter.ShallowEtagHeaderFilter
 
 
 @Configuration
-class ETagConfiguration {
+class ETagConfiguration(private val corsConfig: CorsConfig) {
 
     @Bean
     fun shallowEtagHeaderFilter(): FilterRegistrationBean<ShallowEtagHeaderFilter> {
@@ -21,9 +21,6 @@ class ETagConfiguration {
         filterRegBean.setName("eTagFilter")
         return filterRegBean
     }
-
- @Autowired
-  lateinit var corsConfig: CorsConfig
 
     @Bean
     fun corsFilter(): CorsFilter {
