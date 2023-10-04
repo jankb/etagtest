@@ -14,3 +14,7 @@ spring:
         trace: false
         web-admin-password: test
         web-allow-others: true
+
+corsconfig:
+  allowedOrigins:
+    - "http://localhost:63342"
