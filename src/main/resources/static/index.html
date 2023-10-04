@@ -2,15 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="with=device-width, initial-scale=1.0">
     <title>Etag testing</title>
 </head>
-<script src="scripts.js"></script>
+
+
 <body>
-Some countries
-<form>
-    <button type="button" onclick="fetchData()">
-Get data
-    </button>
-</form>
+
+<button id="getDataButton">Get data</button>
+
+
+<table id="data-table" border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Population</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+
+<script src="scripts.js"></script>
 </body>
 </html>
