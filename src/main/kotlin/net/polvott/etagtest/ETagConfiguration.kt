@@ -30,6 +30,7 @@ class ETagConfiguration(private val corsConfig: CorsConfig) {
         corsConfiguration.allowedHeaders = listOf("*")
         corsConfiguration.allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
         corsConfiguration.allowCredentials = true
+        corsConfiguration.exposedHeaders = listOf("ETag")
         corsConfiguration.setMaxAge(Duration.ofMinutes(30))
         source.registerCorsConfiguration("/**", corsConfiguration)
         return CorsFilter(source)

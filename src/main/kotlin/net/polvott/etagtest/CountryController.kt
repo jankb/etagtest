@@ -1,5 +1,6 @@
 package net.polvott.etagtest
 
+import org.springframework.http.HttpMessage
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -76,11 +77,12 @@ class CountryController(
         return ResponseEntity.ok(resp)
     }
 
-    @PutMapping("/updateAll")
-    fun updateAllCountries(@RequestBody form: CountriesUpdateRequest) : ResponseEntity<AllCountriesResponse>
+ //   @PutMapping("/updateAll")
+    @PutMapping
+    fun updateAllCountries(@RequestBody form: CountriesUpdateRequest) : ResponseEntity<Any>
     {
-        val resp = countryService.updateAllCountries(form)
-        return ResponseEntity.ok(resp)
+        countryService.updateAllCountries(form)
+        return ResponseEntity.noContent().build()
     }
 
     data class CountryCreateForm(
