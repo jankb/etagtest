@@ -30,11 +30,7 @@ class CountryController(
         }
     }
 
-    data class CountryResponse(
-        val id: Int,
-        val name: String,
-        val population: Int
-    )
+
 
     @GetMapping
     fun getAllCountries() : ResponseEntity<AllCountriesResponse>
@@ -54,20 +50,23 @@ class CountryController(
             ))
     }
 
-    data class AllCountriesResponse(
-        val countries: List<CountryResponse>
-    )
-
     @PostMapping
-    fun create(@RequestBody form: CountryCreateForm): ResponseEntity<CountryCreateResponse> {
-        val countryId = countryService.create(
-            CountryCreateRequest(
-                name = form.name,
-                population = form.population
-            )
-        )
+    fun createCountries(@RequestBody form: CountriesCreateForm): ResponseEntity<AllCountriesResponse> {
 
-        return ResponseEntity.ok(CountryCreateResponse(countryId))
+        val countriesCreateRequest = CountriesCreateRequest (
+            countries = form.countries.map {
+                CountryCreateRequest(it.name, it.population)
+            }
+        )
+        val createdCountries = countryService.createCountries(countriesCreateRequest)
+
+        val countryResponse = createdCountries.map {
+            CountryResponse(it.id, it.name, it.population)
+        }
+
+        val response = AllCountriesResponse(countryResponse)
+
+        return ResponseEntity.ok(response)
     }
 
     data class CountryCreateForm(
@@ -75,7 +74,18 @@ class CountryController(
         val population: Int
     )
 
-    data class CountryCreateResponse(
-        val id: Int
+    data class CountriesCreateForm(
+        val countries: List<CountryCreateForm>
     )
+
+    data class CountryResponse(
+        val id: Int,
+        val name: String,
+        val population: Int
+    )
+
+    data class AllCountriesResponse(
+        val countries: List<CountryResponse>
+    )
+
 }

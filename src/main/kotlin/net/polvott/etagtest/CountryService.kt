@@ -40,9 +40,23 @@ class CountryService {
 
         return id.value
     }
+
+    fun createCountries(request: CountriesCreateRequest): List<Country>
+    {
+        val countries = mutableListOf<Country>()
+        request.countries.forEach {
+            val id  = create(it)
+            countries.add(Country(id, it.name, it.population))
+        }
+        return countries
+    }
 }
 
 data class CountryCreateRequest(
     val name: String,
     val population: Int
+)
+
+data class CountriesCreateRequest(
+  val countries: List<CountryCreateRequest>
 )
