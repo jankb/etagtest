@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -14,13 +15,13 @@ class CountryController(
     private val countryService: CountryService
 ) {
     @GetMapping("/{name}")
-    fun getCountryByName(@PathVariable name: String) : ResponseEntity<CountryResponse>
+    fun getCountryByName(@PathVariable name: String) : ResponseEntity<Country>
     {
         val country = countryService.findCountry(name)
 
         return if (country != null) {
             ResponseEntity.ok(
-                CountryResponse(
+                Country(
                 id = country.id,
                 name = country.name,
                 population = country.population
@@ -38,7 +39,7 @@ class CountryController(
         val countries = countryService.getAllCountries()
 
         val cResponse = countries.map {
-            country -> CountryResponse (
+                country -> Country (
                 id = country.id,
                 name = country.name,
                 population = country.population
@@ -61,12 +62,25 @@ class CountryController(
         val createdCountries = countryService.createCountries(countriesCreateRequest)
 
         val countryResponse = createdCountries.map {
-            CountryResponse(it.id, it.name, it.population)
+            Country(it.id, it.name, it.population)
         }
 
         val response = AllCountriesResponse(countryResponse)
 
         return ResponseEntity.ok(response)
+    }
+
+    @PutMapping("/update")
+    fun updateCountries(@RequestBody form: Country): ResponseEntity<Any> {
+        val resp = countryService.update(form)
+        return ResponseEntity.ok(resp)
+    }
+
+    @PutMapping("/updateAll")
+    fun updateAllCountries(@RequestBody form: CountriesUpdateRequest) : ResponseEntity<AllCountriesResponse>
+    {
+        val resp = countryService.updateAllCountries(form)
+        return ResponseEntity.ok(resp)
     }
 
     data class CountryCreateForm(
@@ -76,16 +90,6 @@ class CountryController(
 
     data class CountriesCreateForm(
         val countries: List<CountryCreateForm>
-    )
-
-    data class CountryResponse(
-        val id: Int,
-        val name: String,
-        val population: Int
-    )
-
-    data class AllCountriesResponse(
-        val countries: List<CountryResponse>
     )
 
 }

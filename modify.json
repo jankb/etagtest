@@ -1,0 +1,19 @@
+{
+  "countries": [
+    {
+      "id": 1,
+      "name": "Sweden",
+      "population": 1033
+    },
+    {
+      "id": 2,
+      "name": "Norway",
+      "population": 533
+    },
+    {
+      "id": 3,
+      "name": "Denmark",
+      "population": 733
+    }
+  ]
+}

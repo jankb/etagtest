@@ -5,3 +5,11 @@ data class Country(
     val name: String,
     val population: Int
 )
+
+data class CountriesUpdateRequest(
+    val countries: List<Country>
+)
+
+data class AllCountriesResponse(
+    val countries: List<Country>
+)
