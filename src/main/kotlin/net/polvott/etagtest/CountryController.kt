@@ -1,14 +1,11 @@
 package net.polvott.etagtest
 
-import org.springframework.http.HttpMessage
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.util.DigestUtils
+import org.springframework.web.bind.annotation.*
+import java.io.ByteArrayInputStream
 
 @RestController
 @RequestMapping("/country")
@@ -81,6 +78,30 @@ class CountryController(
     @PutMapping
     fun updateAllCountries(@RequestBody form: CountriesUpdateRequest) : ResponseEntity<Any>
     {
+       val idMapOfCurrentCountries = CountriesUpdateRequest(countryService.getAllCountries()) //.associateBy { it.id }
+        val objectMapper = jacksonObjectMapper()
+        val jsonString = objectMapper.writeValueAsString(idMapOfCurrentCountries)
+        val byteArray = jsonString.toByteArray(Charsets.UTF_8)
+        val stream = ByteArrayInputStream(byteArray)
+
+        val builder = StringBuilder(37)
+        builder.append("\"0")
+        DigestUtils.appendMd5DigestAsHex(stream, builder)
+        builder.append('"')
+        val eTagDone= builder.toString()
+
+        println(eTagDone)
+       val idMapOfModifiedCountries = form.countries.associateBy { it.id }
+
+       /*
+        for ( id in idMapOfCurrentCountries.keys)
+        {
+            if (idMapOfModifiedCountries[id] != idMapOfCurrentCountries[id] )
+            {
+                return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build()
+            }
+        }
+*/
         countryService.updateAllCountries(form)
         return ResponseEntity.noContent().build()
     }
