@@ -76,34 +76,51 @@ class CountryController(
 
  //   @PutMapping("/updateAll")
     @PutMapping
-    fun updateAllCountries(@RequestBody form: CountriesUpdateRequest) : ResponseEntity<Any>
+    fun updateAllCountries(@RequestBody form: CountriesUpdateRequest, @RequestHeader("If-None-Match", required = false) ifNoneMatchHeader: String?) : ResponseEntity<Any>
     {
-       val idMapOfCurrentCountries = CountriesUpdateRequest(countryService.getAllCountries()) //.associateBy { it.id }
-        val objectMapper = jacksonObjectMapper()
-        val jsonString = objectMapper.writeValueAsString(idMapOfCurrentCountries)
-        val byteArray = jsonString.toByteArray(Charsets.UTF_8)
-        val stream = ByteArrayInputStream(byteArray)
+         ifNoneMatchHeader?.let {
+            val countriesUpdateRequest =
+                CountriesUpdateRequest(countryService.getAllCountries())
 
+            val stream = byteArrayInputStream(countriesUpdateRequest)
+            val eTagForCurrentData = generateEtag(stream)
+
+            if (eTagForCurrentData != ifNoneMatchHeader) {
+                val currentCountriesMap = countriesUpdateRequest.countries.associateBy { it.id }
+                val modifiedCountriesMap = form.countries.associateBy { it.id }
+
+                val delta = currentCountriesMap.filter { (id, modifiedCountry) ->
+                    modifiedCountriesMap[id]?.let { it != modifiedCountry } ?: true
+                }.values.toList()
+
+                return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(CountriesUpdateRequest(delta))
+            }
+        } ?: run {
+            countryService.updateAllCountries(form)
+        }
+        return ResponseEntity.noContent().build()
+    }
+
+    private fun generateEtag(stream: ByteArrayInputStream): String {
         val builder = StringBuilder(37)
         builder.append("\"0")
         DigestUtils.appendMd5DigestAsHex(stream, builder)
         builder.append('"')
-        val eTagDone= builder.toString()
+        return builder.toString()
+    }
 
-        println(eTagDone)
-       val idMapOfModifiedCountries = form.countries.associateBy { it.id }
-
-       /*
-        for ( id in idMapOfCurrentCountries.keys)
-        {
-            if (idMapOfModifiedCountries[id] != idMapOfCurrentCountries[id] )
-            {
-                return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build()
-            }
-        }
-*/
-        countryService.updateAllCountries(form)
-        return ResponseEntity.noContent().build()
+    /**
+     * Converts a given object into a [ByteArrayInputStream] by serializing the object to JSON
+     * and then converting it to a byte array.
+     *
+     * @param data The object to be converted to a [ByteArrayInputStream].
+     * @return A [ByteArrayInputStream] representation of the serialized object.
+     */
+    private fun byteArrayInputStream(data: Any): ByteArrayInputStream {
+        val objectMapper = jacksonObjectMapper()
+        val jsonString = objectMapper.writeValueAsString(data)
+        val byteArray = jsonString.toByteArray(Charsets.UTF_8)
+        return ByteArrayInputStream(byteArray)
     }
 
     data class CountryCreateForm(
